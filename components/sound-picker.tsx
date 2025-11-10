@@ -19,7 +19,7 @@ export const SoundPicker: React.FC<SoundPickerProps> = ({
   setSelectedSamples,
 }) => {
   return (
-    <div className="grid gap-2 sm:gap-3">
+    <div className="grid gap-2">
       <div className="h-10 sm:h-14 flex items-center justify-center border-b-2 border-border">
         <span className="text-xs sm:text-sm font-bold text-muted-foreground tracking-wide">
           SOUNDS
@@ -28,7 +28,7 @@ export const SoundPicker: React.FC<SoundPickerProps> = ({
       {selectedSamples.map((selectedSample, trackId) => (
         <div
           key={trackId}
-          className="h-10 sm:h-14 flex items-center justify-center"
+          className="h-10 sm:h-14 flex items-center justify-center space-y-0"
         >
           <Select
             value={selectedSample}

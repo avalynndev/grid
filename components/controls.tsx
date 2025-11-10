@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -17,6 +17,7 @@ interface ControlsProps {
   setMeasures: React.Dispatch<React.SetStateAction<number>>;
   setBeats: React.Dispatch<React.SetStateAction<number>>;
   measures: number;
+  selectedSamples: string[];
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -24,6 +25,7 @@ export const Controls: React.FC<ControlsProps> = ({
   setMeasures,
   setBeats,
   measures,
+  selectedSamples,
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [bpm, setBpm] = useState(120);
@@ -63,7 +65,7 @@ export const Controls: React.FC<ControlsProps> = ({
           </Button>
 
           <div className="w-full sm:w-auto flex items-center gap-3">
-            <Label className="min-w-[3rem] font-medium text-sm">BPM</Label>
+            <Label className="min-w-12 font-medium text-sm">BPM</Label>
             <Slider
               min={30}
               max={300}
@@ -72,13 +74,13 @@ export const Controls: React.FC<ControlsProps> = ({
               onValueChange={handleBpmChange}
               className="flex-1 sm:w-32"
             />
-            <span className="text-sm font-mono font-semibold min-w-[3rem] text-right">
+            <span className="text-sm font-semibold min-w-12 text-right">
               {bpm}
             </span>
           </div>
 
           <div className="w-full sm:w-auto flex items-center gap-3">
-            <Label className="min-w-[4rem] font-medium text-sm">Volume</Label>
+            <Label className="min-w-16 font-medium text-sm">Volume</Label>
             <Slider
               min={0}
               max={1}
@@ -87,7 +89,7 @@ export const Controls: React.FC<ControlsProps> = ({
               onValueChange={handleVolumeChange}
               className="flex-1 sm:w-32"
             />
-            <span className="text-sm font-mono font-semibold min-w-[3rem] text-right">
+            <span className="text-sm font-semibold min-w-12 text-right">
               {Math.round(volume * 100)}%
             </span>
           </div>
@@ -121,7 +123,7 @@ export const Controls: React.FC<ControlsProps> = ({
               className="flex-1 sm:flex-initial sm:w-32 font-medium text-sm"
               onClick={() => setMeasures((prev) => prev + 1)}
             >
-              + Add
+              + Measure
             </Button>
 
             <Button
@@ -130,7 +132,35 @@ export const Controls: React.FC<ControlsProps> = ({
               onClick={() => setMeasures((prev) => Math.max(prev - 1, 2))}
               disabled={measures <= 2}
             >
-              - Remove
+              - Measure
+            </Button>
+          </div>
+
+          <div className="hidden sm:block h-8 w-px bg-border"></div>
+
+          <div className="flex gap-2 w-full sm:w-auto">
+            <Button
+              variant="secondary"
+              className="flex-1 sm:flex-initial sm:w-32 font-medium text-sm"
+              onClick={() => {
+                setSelectedSamples((prev) => [...prev, "Kick"]);
+              }}
+            >
+              + Track
+            </Button>
+
+            <Button
+              variant="secondary"
+              className="flex-1 sm:flex-initial sm:w-32 font-medium text-sm"
+              onClick={() => {
+                setSelectedSamples((prev) => {
+                  if (prev.length <= 1) return prev;
+                  return prev.slice(0, -1);
+                });
+              }}
+              disabled={selectedSamples.length <= 1}
+            >
+              - Track
             </Button>
           </div>
         </div>

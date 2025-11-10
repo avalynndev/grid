@@ -88,6 +88,7 @@ export default function Home() {
       <Controls
         setSelectedSamples={setSelectedSamples}
         setMeasures={setMeasures}
+        selectedSamples={selectedSamples}
         setBeats={setBeats}
         measures={measures}
       />
@@ -95,7 +96,7 @@ export default function Home() {
         <ThemeToggle />
       </div>
 
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-64 sm:pt-54 md:pt-40 xl:pt-30">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-76 sm:pt-64 md:pt-52 xl:pt-48">
         {Array.from({ length: measureRows }, (_, rowIndex) => {
           const startMeasure = rowIndex * measuresPerRow;
           const endMeasure = Math.min(startMeasure + measuresPerRow, measures);
@@ -177,9 +178,9 @@ export default function Home() {
                                         }
                                         stepsRef.current[trackId][stepId] = elm;
                                       }}
-                                      className="absolute w-px h-px -m-px p-0 overflow-hidden whitespace-nowrap border-0 clip-rect-0"
+                                      className="absolute w-0 h-0 -m-px p-0 overflow-hidden whitespace-nowrap border-0 clip-rect-0"
                                     />
-                                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-background border-2 border-input rounded-lg transition-all hover:border-primary/50 active:scale-95 [input:checked+&]:bg-primary [input:checked+&]:border-primary [input:checked+&]:shadow-lg [input:focus-visible+&]:outline [input:focus-visible+&]:outline-2 [input:focus-visible+&]:outline-ring [input:focus-visible+&]:outline-offset-2"></div>
+                                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-background border-2 border-input rounded-lg transition-all hover:border-primary/50 active:scale-95 [input:checked+&]:bg-primary [input:checked+&]:border-primary [input:checked+&]:shadow-lg [input:focus-visible+&]:outline-2 [input:focus-visible+&]:outline-ring [input:focus-visible+&]:outline-offset-2"></div>
                                   </Label>
                                 );
                               })}
