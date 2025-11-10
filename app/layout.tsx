@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Indie_Flower } from "next/font/google";
+import { Indie_Flower } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 
@@ -19,9 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${indieFlower.className} antialiased`}
-      >
+      <body className={`${indieFlower.className} antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

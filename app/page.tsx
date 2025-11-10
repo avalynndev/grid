@@ -53,7 +53,7 @@ export default function Home() {
         });
       },
       stepIds,
-      "16n"
+      "16n",
     );
     seqRef.current.start(0);
 
@@ -68,9 +68,9 @@ export default function Home() {
   useEffect(() => {
     const updateMeasuresPerRow = () => {
       if (window.innerWidth < 640) {
-        setMeasuresPerRow(1); 
+        setMeasuresPerRow(1);
       } else if (window.innerWidth < 1024) {
-        setMeasuresPerRow(2); 
+        setMeasuresPerRow(2);
       } else {
         setMeasuresPerRow(4);
       }
