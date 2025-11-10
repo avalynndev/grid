@@ -1,65 +1,200 @@
-import Image from "next/image";
+"use client";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card } from "@/components/ui/card";
+import { useEffect, useState, useRef } from "react";
+import * as Tone from "tone";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { ActiveIndicator } from "@/components/active-indicator";
+import { Controls } from "@/components/controls";
+import { samples } from "@/constants/samples";
+import { SoundPicker } from "@/components/sound-picker";
+import { Track } from "@/types";
+
+const NOTE = "C2";
 
 export default function Home() {
+  const [measures, setMeasures] = useState<number>(4);
+  const [beats, setBeats] = useState<number>(4);
+  const [selectedSamples, setSelectedSamples] = useState<string[]>([
+    samples[0].name,
+    samples[1].name,
+    samples[2].name,
+    samples[3].name,
+  ]);
+
+  const tracksRef = useRef<Track[]>([]);
+  const stepsRef = useRef<HTMLInputElement[][]>([]);
+  const activeRef = useRef<HTMLInputElement[]>([]);
+  const seqRef = useRef<Tone.Sequence | null>(null);
+
+  const stepIds = [...Array(beats * measures).keys()];
+
+  useEffect(() => {
+    tracksRef.current = selectedSamples.map((selectedSample, i) => ({
+      id: i,
+      key: "track" + i,
+      sampler: new Tone.Sampler({
+        urls: {
+          [NOTE]: samples.find((sample) => sample.name === selectedSample)!.url,
+        },
+      }).toDestination(),
+    }));
+
+    seqRef.current = new Tone.Sequence(
+      (time, step) => {
+        tracksRef.current.forEach((trk) => {
+          if (stepsRef.current[trk.id]?.[step]?.checked) {
+            trk.sampler.triggerAttack(NOTE, time);
+          }
+          if (activeRef.current[step]) {
+            activeRef.current[step].checked = true;
+          }
+        });
+      },
+      stepIds,
+      "16n"
+    );
+    seqRef.current.start(0);
+
+    return () => {
+      seqRef.current?.dispose();
+      tracksRef.current.forEach((trk) => trk.sampler.dispose());
+    };
+  }, [selectedSamples, beats * measures]);
+
+  const [measuresPerRow, setMeasuresPerRow] = useState(4);
+
+  useEffect(() => {
+    const updateMeasuresPerRow = () => {
+      if (window.innerWidth < 640) {
+        setMeasuresPerRow(1); 
+      } else if (window.innerWidth < 1024) {
+        setMeasuresPerRow(2); 
+      } else {
+        setMeasuresPerRow(4);
+      }
+    };
+
+    updateMeasuresPerRow();
+    window.addEventListener("resize", updateMeasuresPerRow);
+    return () => window.removeEventListener("resize", updateMeasuresPerRow);
+  }, []);
+
+  const measureRows = Math.ceil(measures / measuresPerRow);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <div className="min-h-screen bg-linear-to-br from-background to-muted/20">
+      <Controls
+        setSelectedSamples={setSelectedSamples}
+        setMeasures={setMeasures}
+        setBeats={setBeats}
+        measures={measures}
+      />
+      <div className="absolute top-2 right-4 z-40">
+        <ThemeToggle />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-64 sm:pt-54 md:pt-40 xl:pt-30">
+        {Array.from({ length: measureRows }, (_, rowIndex) => {
+          const startMeasure = rowIndex * measuresPerRow;
+          const endMeasure = Math.min(startMeasure + measuresPerRow, measures);
+          const measuresInThisRow = endMeasure - startMeasure;
+
+          return (
+            <div key={rowIndex} className="mb-4 sm:mb-8">
+              <div
+                className="grid gap-3 sm:gap-6"
+                style={{
+                  gridTemplateColumns: rowIndex === 0 ? "auto 1fr" : "1fr",
+                }}
+              >
+                {rowIndex === 0 && (
+                  <SoundPicker
+                    samples={samples}
+                    selectedSamples={selectedSamples}
+                    setSelectedSamples={setSelectedSamples}
+                  />
+                )}
+
+                <div
+                  className="grid gap-3 sm:gap-4"
+                  style={{
+                    gridTemplateColumns: `repeat(${measuresInThisRow}, minmax(0, 1fr))`,
+                  }}
+                >
+                  {Array.from({ length: measuresInThisRow }, (_, i) => {
+                    const measureIndex = startMeasure + i;
+                    return (
+                      <Card
+                        key={measureIndex}
+                        className="p-2 sm:p-4 bg-card/50 backdrop-blur-sm border-2 shadow-lg hover:shadow-xl transition-shadow"
+                      >
+                        <div className="grid gap-2 sm:gap-3">
+                          <div className="flex items-center justify-between mb-1 sm:mb-2 pb-1 sm:pb-2 border-b-2 border-border">
+                            <span className="text-xs font-bold text-muted-foreground tracking-wider">
+                              M{measureIndex + 1}
+                            </span>
+                            <div
+                              className="grid gap-0.5 sm:gap-1"
+                              style={{
+                                gridTemplateColumns: `repeat(${beats}, minmax(0, 1fr))`,
+                              }}
+                            >
+                              {Array.from({ length: beats }, (_, beatIndex) => (
+                                <ActiveIndicator
+                                  key={beatIndex}
+                                  stepId={beatIndex + measureIndex * beats}
+                                  activeRef={activeRef}
+                                />
+                              ))}
+                            </div>
+                          </div>
+
+                          {selectedSamples.map((selectedSample, trackId) => (
+                            <div
+                              key={trackId}
+                              className="grid gap-1 sm:gap-1.5"
+                              style={{
+                                gridTemplateColumns: `repeat(${beats}, minmax(0, 1fr))`,
+                              }}
+                            >
+                              {Array.from({ length: beats }, (_, beatIndex) => {
+                                const stepId = beatIndex + measureIndex * beats;
+                                const id = `${trackId}-${stepId}`;
+                                return (
+                                  <Label
+                                    key={id}
+                                    className="cursor-pointer flex justify-center"
+                                  >
+                                    <Input
+                                      id={id}
+                                      type="checkbox"
+                                      ref={(elm) => {
+                                        if (!elm) return;
+                                        if (!stepsRef.current[trackId]) {
+                                          stepsRef.current[trackId] = [];
+                                        }
+                                        stepsRef.current[trackId][stepId] = elm;
+                                      }}
+                                      className="absolute w-px h-px -m-px p-0 overflow-hidden whitespace-nowrap border-0 clip-rect-0"
+                                    />
+                                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-background border-2 border-input rounded-lg transition-all hover:border-primary/50 active:scale-95 [input:checked+&]:bg-primary [input:checked+&]:border-primary [input:checked+&]:shadow-lg [input:focus-visible+&]:outline [input:focus-visible+&]:outline-2 [input:focus-visible+&]:outline-ring [input:focus-visible+&]:outline-offset-2"></div>
+                                  </Label>
+                                );
+                              })}
+                            </div>
+                          ))}
+                        </div>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
