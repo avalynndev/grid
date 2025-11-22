@@ -9,7 +9,22 @@ const indieFlower = Indie_Flower({
 });
 
 export const metadata: Metadata = {
-  title: "DrumGrid",
+  title: "MusicGrid",
+  description:
+    "Create beats with a web-based step sequencer using multiple tracks, samples, and real-time playback.",
+  keywords: [
+    "React",
+    "TypeScript",
+    "Tone.js",
+    "Web Audio",
+    "Drum Machine",
+    "Step Sequencer",
+    "Music Production",
+    "Interactive UI",
+    "Sample Pads",
+    "Beat Maker",
+  ],
+  authors: [{ name: "avalynndev", url: "https://avalynndev.vercel.app/" }],
 };
 
 export default function RootLayout({
