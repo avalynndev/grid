@@ -3,6 +3,7 @@
 **Create beats with multiple tracks and samples.**
 
 This is a web app where you can make music using a step sequencer. You can pick different sounds, set the number of beats and measures, and play your rhythm in real time.
+Check out the [video](https://youtu.be/JS07E6a26bM) for more understanding.
 
 ## Features
 
